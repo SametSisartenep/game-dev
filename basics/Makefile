@@ -1,25 +1,35 @@
 CC=g++
-INCS=-I/home/samet/tools/sfml/SFML-2.3/include
+INCLUDES=-I/home/samet/tools/sfml/SFML-2.3/include
 LIBS=-L/home/samet/tools/sfml/SFML-2.3/lib
-MODULES=-lsfml-graphics -lsfml-window -lsfml-system
 
-.PHONY: clean execute
+.PHONY: clean
 
-main.o: main.cpp
-	@echo "Creating $@..."
-	@$(CC) -c $< -o $@ $(INCS)
+main: main.cpp
+	@echo "Generating object..."
+	$(CC) -c $< $(INCLUDES)
+	@echo "Compiling object..."
+	$(CC) -o $@ $@.o $(LIBS) -lsfml-graphics -lsfml-window -lsfml-system
+	@echo -e "\x1b[0;32mCompiled!\x1b[0m"
 
-sfml-app: main.o
-	@echo "Compiling everything..."
-	@$(CC) -o $@ $< $(LIBS) $(MODULES)
-	@echo -e "\x1b[0;32mCompiled successfully!\x1b[0m"
+main-plus-clock: main-plus-clock.cpp
+	@echo "Generating object..."
+	$(CC) -c $< $(INCLUDES)
+	@echo "Compiling object..."
+	$(CC) -o $@ $@.o $(LIBS) -lsfml-graphics -lsfml-window -lsfml-system
+	@echo -e "\x1b[0;32mCompiled!\x1b[0m"
 
-all: main.o sfml-app
-
-execute:
-	LD_LIBRARY_PATH=/home/samet/tools/sfml/SFML-2.3/lib ./sfml-app
+threading: threading.cpp
+	@echo "Generating object..."
+	$(CC) -c $< $(INCLUDES)
+	@echo "Compiling object..."
+	$(CC) -o $@ $@.o $(LIBS) -lsfml-graphics -lsfml-window -lsfml-system
+	@echo -e "\x1b[0;32mCompiled!\x1b[0m"
 
 clean:
-	@echo "Cleaning everything up!..."
-	@rm -rfv ./sfml-app ./main.o
-	@echo -e "\x1b[0;33mCleaned!\x1b[0m"
+	@for file in `ls`; do \
+		type=`file $$file | awk '{print $$2}'`; \
+		echo -e "\x1b[1;37mFile:\x1b[0m \x1b[0;35m$$file\x1b[0m \x1b[1;34m|\x1b[0m \x1b[1;37mType:\x1b[0m \x1b[0;35m$$type\x1b[0m"; \
+		if [[ $$type == "ELF" ]]; then \
+			rm -rfv ./$$file; \
+		fi \
+	done
